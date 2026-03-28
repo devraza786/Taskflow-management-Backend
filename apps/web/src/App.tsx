@@ -5,6 +5,10 @@ import { useAuthStore } from './store/auth.store';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import Dashboard from './pages/dashboard/Dashboard';
+import TaskList from './pages/tasks/TaskList';
+import ProjectList from './pages/projects/ProjectList';
+import TeamManagement from './pages/team/TeamManagement';
+import Settings from './pages/settings/Settings';
 import Sidebar from './components/layout/Sidebar';
 import Navbar from './components/layout/Navbar';
 
@@ -46,8 +50,43 @@ function App() {
               </ProtectedLayout>
             }
           />
+
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedLayout>
+                <TaskList />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/projects"
+            element={
+              <ProtectedLayout>
+                <ProjectList />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/team"
+            element={
+              <ProtectedLayout>
+                <TeamManagement />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedLayout>
+                <Settings />
+              </ProtectedLayout>
+            }
+          />
           
-          {/* Placeholder for other routes */}
           <Route
             path="*"
             element={

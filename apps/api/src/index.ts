@@ -7,6 +7,13 @@ import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import taskRoutes from './routes/task.routes';
 
+import orgRoutes from './routes/org.routes';
+import deptRoutes from './routes/dept.routes';
+import teamRoutes from './routes/team.routes';
+import projectRoutes from './routes/project.routes';
+import commentRoutes from './routes/comment.routes';
+import attachmentRoutes from './routes/attachment.routes';
+
 dotenv.config();
 
 const app = express();
@@ -22,6 +29,12 @@ app.use(express.json());
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/tasks', taskRoutes);
+app.use('/api/v1/orgs', orgRoutes);
+app.use('/api/v1/depts', deptRoutes);
+app.use('/api/v1/teams', teamRoutes);
+app.use('/api/v1/projects', projectRoutes);
+app.use('/api/v1/comments', commentRoutes);
+app.use('/api/v1/attachments', attachmentRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
