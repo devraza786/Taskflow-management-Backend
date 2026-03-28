@@ -1,8 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import api from '../lib/api';
 import { useAuthStore } from '../store/auth.store';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
 export interface Team {
   id: string;
@@ -17,15 +15,13 @@ export interface Team {
 }
 
 export function useTeams() {
-  const token = useAuthStore((state) => state.token);
+  const token = useAuthStore((state) => state.accessToken);
   const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: ['teams'],
     queryFn: async () => {
-      const { data } = await axios.get(`${API_URL}/teams`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await api.get('/teams');
       return data as Team[];
     },
     enabled: !!token,
@@ -33,9 +29,7 @@ export function useTeams() {
 
   const createMutation = useMutation({
     mutationFn: async (newTeam: Partial<Team>) => {
-      const { data } = await axios.post(`${API_URL}/teams`, newTeam, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await api.post('/teams', newTeam);
       return data;
     },
     onSuccess: () => {

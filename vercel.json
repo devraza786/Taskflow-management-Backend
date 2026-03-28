@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api/v1/(.*)",
+      "destination": "apps/api/src/index.ts"
+    },
+    {
+      "source": "/health",
+      "destination": "apps/api/src/index.ts"
+    }
+  ]
+}
