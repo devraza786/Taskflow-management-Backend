@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  html, body {
+    @apply overflow-x-hidden scroll-smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
   body {
     @apply bg-surface text-slate-900 font-brand;
   }
