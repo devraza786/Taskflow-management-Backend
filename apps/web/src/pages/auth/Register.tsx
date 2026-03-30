@@ -27,6 +27,7 @@ export default function Register() {
       setAuth(data.user, data.accessToken, data.refreshToken);
       navigate('/');
     } catch (err: any) {
+      console.error('Registration failed:', err);
       setError(err.response?.data?.error || 'Failed to register');
     } finally {
       setLoading(false);

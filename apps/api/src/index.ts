@@ -21,7 +21,19 @@ const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://taskflow-management-backend-web.vercel.app',
+  process.env.CORS_ORIGIN || ''
+].filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+}));
+
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -42,12 +54,14 @@ app.get('/health', (req, res) => {
 
 // Basic Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  console.error('API Error:', err);
+  res.status(500).json({ error: 'Something went wrong!', details: err.message });
 });
 
-app.listen(port, () => {
-  console.log(`🚀 TaskFlow API running at http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`🚀 TaskFlow API running at http://localhost:${port}`);
+  });
+}
 
 export default app;
