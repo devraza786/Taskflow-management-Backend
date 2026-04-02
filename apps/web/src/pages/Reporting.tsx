@@ -67,8 +67,8 @@ export default function Reporting() {
   const statsCards = [
     { label: 'Total Projects', value: projectStats?.projects?.length || 0, icon: TrendingUp, color: 'text-primary-600', bg: 'bg-primary-50' },
     { label: 'Active Teams', value: teamStats?.length || 0, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Tasks Completed', value: '128', icon: CheckCircle2, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Avg. Completion', value: '4.2d', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Tasks Completed', value: projectStats?.metrics?.completed || 0, icon: CheckCircle2, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Avg. Completion', value: `${projectStats?.metrics?.avgDays || 0}d`, icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
   ];
 
   if (isLoading) {
@@ -199,18 +199,11 @@ export default function Reporting() {
       </div>
 
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <h2 className="text-xl font-bold text-slate-900 mb-8 font-black uppercase tracking-widest text-sm text-slate-400">Project Velocity (Mock)</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-8 font-black uppercase tracking-widest text-sm text-slate-400">Project Velocity (Last 6 Weeks)</h2>
         <div className="h-[350px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
-              data={[
-                { name: 'Week 1', completed: 12, total: 20 },
-                { name: 'Week 2', completed: 19, total: 25 },
-                { name: 'Week 3', completed: 15, total: 30 },
-                { name: 'Week 4', completed: 22, total: 28 },
-                { name: 'Week 5', completed: 30, total: 35 },
-                { name: 'Week 6', completed: 25, total: 40 },
-              ]}
+              data={projectStats?.metrics?.velocity || []}
             >
               <defs>
                 <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">

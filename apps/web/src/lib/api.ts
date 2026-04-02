@@ -15,11 +15,12 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    // Handle 401 (Unauthorized) - could implement refresh token logic here
+    // Handle 401 (Unauthorized)
     if (error.response?.status === 401) {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      // window.location.href = '/login';
+      // Lazy import to avoid circular dependency crashing the store instantiation
+      const { useAuthStore } = await import('../store/auth.store');
+      useAuthStore.getState().logout();
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
