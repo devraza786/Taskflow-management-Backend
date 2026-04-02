@@ -7,6 +7,7 @@ interface User {
   name: string;
   role: 'admin' | 'manager' | 'team_head' | 'employee';
   orgId: string;
+  plan?: 'free' | 'starter' | 'business' | 'enterprise';
 }
 
 interface AuthState {
@@ -14,6 +15,7 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   setAuth: (user: User, accessToken: string, refreshToken: string) => void;
+  setUser: (user: User) => void;
   logout: () => void;
 }
 
@@ -28,6 +30,7 @@ export const useAuthStore = create<AuthState>()(
         localStorage.setItem('refreshToken', refreshToken);
         set({ user, accessToken, refreshToken });
       },
+      setUser: (user) => set({ user }),
       logout: () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');

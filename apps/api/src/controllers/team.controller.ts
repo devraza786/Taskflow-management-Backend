@@ -126,3 +126,48 @@ export const updateTeam = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const deleteTeam = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+    if (req.user.role === 'employee') return res.status(403).json({ error: 'Forbidden' });
+
+    await prisma.team.delete({
+      where: { id, orgId: req.user.orgId },
+    });
+
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const removeTeamMember = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id: teamId, userId } = req.params;
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+    if (req.user.role === 'employee') return res.status(403).json({ error: 'Forbidden' });
+
+    // Verify team belongs to org
+    const team = await prisma.team.findUnique({ where: { id: teamId } });
+    if (!team || team.orgId !== req.user.orgId) {
+      return res.status(404).json({ error: 'Team not found' });
+    }
+
+    await prisma.teamMember.delete({
+      where: {
+        userId_teamId: {
+          userId,
+          teamId,
+        },
+      },
+    });
+
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

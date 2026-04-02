@@ -11,25 +11,28 @@ export interface Project {
   endDate?: string;
   ownerId?: string;
   deptId?: string;
-  _count?: {
-    tasks: number;
-  };
+  owner?: { id: string; name: string; avatarUrl?: string };
+  department?: { id: string; name: string };
+  _count?: { tasks: number };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export function useProjects() {
   const token = useAuthStore((state) => state.accessToken);
-  const queryClient = useQueryClient();
-
-  const query = useQuery({
+  return useQuery<Project[]>({
     queryKey: ['projects'],
     queryFn: async () => {
       const { data } = await api.get('/projects');
-      return data as Project[];
+      return data;
     },
     enabled: !!token,
   });
+}
 
-  const createMutation = useMutation({
+export function useCreateProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: async (newProject: Partial<Project>) => {
       const { data } = await api.post('/projects', newProject);
       return data;
@@ -38,6 +41,29 @@ export function useProjects() {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
     },
   });
+}
 
-  return { ...query, createProject: createMutation.mutate };
+export function useUpdateProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...patch }: Partial<Project> & { id: string }) => {
+      const { data } = await api.patch(`/projects/${id}`, patch);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+}
+
+export function useDeleteProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (projectId: string) => {
+      await api.delete(`/projects/${projectId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
 }

@@ -10,6 +10,8 @@ import TaskList from './pages/tasks/TaskList';
 import ProjectList from './pages/projects/ProjectList';
 import TeamManagement from './pages/team/TeamManagement';
 import Settings from './pages/settings/Settings';
+import Reporting from './pages/Reporting';
+import PremiumGuard from './components/auth/PremiumGuard';
 import Sidebar from './components/layout/Sidebar';
 import Navbar from './components/layout/Navbar';
 
@@ -29,19 +31,24 @@ const pageTransition = {
 
 function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const user = useAuthStore((state) => state.user);
+  const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
   return (
-    <div className="flex min-h-screen bg-surface overflow-x-hidden">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Navbar />
-        <main className="p-4 md:p-8 flex-1">
+    <div className="flex h-screen bg-surface overflow-hidden">
+      <Sidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        <main className="p-4 md:p-8 flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
+              key={window.location.pathname}
               initial="initial"
               animate="animate"
               exit="exit"
@@ -59,14 +66,18 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const Router = BrowserRouter as any;
+  const Shell = Routes as any;
+  const RouteItem = Route as any;
+
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+      <Router>
+        <Shell>
+          <RouteItem path="/login" element={<Login />} />
+          <RouteItem path="/register" element={<Register />} />
           
-          <Route
+          <RouteItem
             path="/"
             element={
               <ProtectedLayout>
@@ -75,7 +86,7 @@ function App() {
             }
           />
 
-          <Route
+          <RouteItem
             path="/tasks"
             element={
               <ProtectedLayout>
@@ -84,7 +95,7 @@ function App() {
             }
           />
 
-          <Route
+          <RouteItem
             path="/projects"
             element={
               <ProtectedLayout>
@@ -93,7 +104,7 @@ function App() {
             }
           />
 
-          <Route
+          <RouteItem
             path="/team"
             element={
               <ProtectedLayout>
@@ -102,7 +113,18 @@ function App() {
             }
           />
 
-          <Route
+          <RouteItem
+            path="/reports"
+            element={
+              <ProtectedLayout>
+                <PremiumGuard minTier="pro">
+                  <Reporting />
+                </PremiumGuard>
+              </ProtectedLayout>
+            }
+          />
+
+          <RouteItem
             path="/settings"
             element={
               <ProtectedLayout>
@@ -110,8 +132,8 @@ function App() {
               </ProtectedLayout>
             }
           />
-          
-          <Route
+
+          <RouteItem
             path="*"
             element={
               <ProtectedLayout>
@@ -124,8 +146,8 @@ function App() {
               </ProtectedLayout>
             }
           />
-        </Routes>
-      </BrowserRouter>
+        </Shell>
+      </Router>
     </QueryClientProvider>
   );
 }

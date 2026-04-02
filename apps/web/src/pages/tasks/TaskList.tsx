@@ -1,4 +1,7 @@
+import React, { useState } from 'react';
 import { useTasks, type Task } from '../../hooks/useTasks';
+import CreateTaskModal from '../../components/CreateTaskModal';
+import RoleGuard from '../../components/auth/RoleGuard';
 import { 
   Plus, 
   Search, 
@@ -25,6 +28,7 @@ const PriorityBadge = ({ priority }: { priority: Task['priority'] }) => {
 
 export default function TaskList() {
   const { data: tasks, isLoading } = useTasks();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -45,15 +49,20 @@ export default function TaskList() {
             <button className="p-3 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 transition-colors">
                 <Filter className="h-5 w-5 text-slate-600" />
             </button>
-            <button className="flex items-center gap-2 bg-primary-600 text-white px-5 py-3 rounded-2xl font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 active:scale-95 transition-all text-sm">
-                <Plus className="h-4 w-4" />
-                Add Task
-            </button>
+            <RoleGuard allowedRoles={['admin', 'manager', 'team_head']}>
+                <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-primary-600 text-white px-5 py-3 rounded-2xl font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 active:scale-95 transition-all text-sm"
+                >
+                    <Plus className="h-4 w-4" />
+                    Add Task
+                </button>
+            </RoleGuard>
         </div>
       </div>
 
       <div className="bg-white rounded-[2.5rem] p-4 border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left">
                 <thead>
                     <tr className="border-b border-slate-50">
@@ -88,7 +97,7 @@ export default function TaskList() {
                                         </div>
                                         <div>
                                             <p className="font-bold text-slate-900">{task.title}</p>
-                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wide mt-0.5">PROJ-1234 • Project Name</p>
+                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wide mt-0.5">TASKFLOW • Efficiency</p>
                                         </div>
                                     </div>
                                 </td>
@@ -132,7 +141,44 @@ export default function TaskList() {
                 </tbody>
             </table>
         </div>
+
+        <div className="md:hidden space-y-4">
+            {isLoading ? (
+                Array(3).fill(0).map((_, i) => (
+                    <div key={i} className="h-24 bg-slate-50 animate-pulse rounded-3xl" />
+                ))
+            ) : tasks?.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 font-medium">No tasks found.</div>
+            ) : (
+                tasks?.map((task) => (
+                    <div key={task.id} className="p-6 rounded-3xl border border-slate-100 bg-slate-50/50 space-y-4">
+                        <div className="flex justify-between items-start">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-xl bg-white text-slate-500 shadow-sm">
+                                    <CheckCircle2 className="h-4 w-4" />
+                                </div>
+                                <p className="font-bold text-slate-900 line-clamp-1">{task.title}</p>
+                            </div>
+                            <MoreVertical className="h-4 w-4 text-slate-400" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <PriorityBadge priority={task.priority} />
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500">
+                                <Calendar className="h-3 w-3" />
+                                {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—'}
+                            </div>
+                        </div>
+                    </div>
+                ))
+            )}
+        </div>
       </div>
+
+      <CreateTaskModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 }
+

@@ -5,7 +5,19 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "REFRESH_TOKEN_SECRET",
+        "NEON_AUTH_URL",
+        "NEON_JWKS_URL",
+        "NEON_API_URL",
+        "VITE_API_URL",
+        "NODE_ENV",
+        "PORT",
+        "CORS_ORIGIN"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -15,7 +27,19 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "REFRESH_TOKEN_SECRET",
+        "NEON_AUTH_URL",
+        "NEON_JWKS_URL",
+        "NEON_API_URL",
+        "VITE_API_URL",
+        "NODE_ENV",
+        "PORT",
+        "CORS_ORIGIN"
+      ]
     }
   }
 }

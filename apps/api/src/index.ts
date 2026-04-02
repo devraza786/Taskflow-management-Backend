@@ -14,6 +14,9 @@ import projectRoutes from './routes/project.routes';
 import commentRoutes from './routes/comment.routes';
 import attachmentRoutes from './routes/attachment.routes';
 
+import reportRoutes from './routes/report.routes';
+import notificationRoutes from './routes/notification.routes';
+
 dotenv.config();
 
 const app = express();
@@ -47,6 +50,8 @@ app.use('/api/v1/teams', teamRoutes);
 app.use('/api/v1/projects', projectRoutes);
 app.use('/api/v1/comments', commentRoutes);
 app.use('/api/v1/attachments', attachmentRoutes);
+app.use('/api/v1/reports', reportRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

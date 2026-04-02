@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useProjects, Project } from '../../hooks/useProjects';
+import CreateProjectModal from '../../components/CreateProjectModal';
+import RoleGuard from '../../components/auth/RoleGuard';
 import { 
   Plus, 
   FolderKanban, 
@@ -28,6 +30,7 @@ const StatusBadge = ({ status }: { status: Project['status'] }) => {
 
 export default function ProjectList() {
   const { data: projects, isLoading } = useProjects();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -36,10 +39,15 @@ export default function ProjectList() {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Projects</h1>
           <p className="text-slate-500 mt-1 font-medium">Manage and track your organizational initiatives.</p>
         </div>
-        <button className="flex items-center gap-2 bg-primary-600 text-white px-5 py-3 rounded-2xl font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 active:scale-95 transition-all text-sm">
-          <Plus className="h-4 w-4" />
-          New Project
-        </button>
+        <RoleGuard allowedRoles={['admin', 'manager']}>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 bg-primary-600 text-white px-5 py-3 rounded-2xl font-bold shadow-lg shadow-primary-200 hover:bg-primary-700 active:scale-95 transition-all text-sm"
+          >
+            <Plus className="h-4 w-4" />
+            New Project
+          </button>
+        </RoleGuard>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -84,7 +92,7 @@ export default function ProjectList() {
                   <StatusBadge status={project.status} />
                   <div className="flex items-center gap-2 text-slate-400 text-xs font-bold">
                     <Clock className="h-3.5 w-3.5" />
-                    <span>Updated 2 days ago</span>
+                    <span>Updated Recently</span>
                   </div>
                 </div>
 
@@ -93,23 +101,18 @@ export default function ProjectList() {
                     <div className="space-y-4 flex-1">
                       <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
                         <span>Progress</span>
-                        <span className="text-slate-900">64%</span>
+                        <span className="text-slate-900">0%</span>
                       </div>
                       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary-600 rounded-full w-[64%]" />
+                        <div className="h-full bg-primary-600 rounded-full w-[0%]" />
                       </div>
                     </div>
                   </div>
                    <div className="flex items-center justify-between mt-6">
                         <div className="flex -space-x-2">
-                           {[1, 2, 3].map(i => (
-                               <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
-                                   JD
-                               </div>
-                           ))}
-                           <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-50 flex items-center justify-center text-[10px] font-bold text-slate-400">
-                               +4
-                           </div>
+                             <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-50 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                                ...
+                            </div>
                         </div>
                         <div className="flex items-center gap-3">
                            <div className="flex items-center gap-1 text-slate-500 text-xs font-bold">
@@ -124,6 +127,12 @@ export default function ProjectList() {
           ))
         )}
       </div>
+
+      <CreateProjectModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 }
+
