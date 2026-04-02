@@ -158,9 +158,9 @@ export const removeTeamMember = async (req: AuthRequest, res: Response) => {
 
     await prisma.teamMember.delete({
       where: {
-        userId_teamId: {
-          userId,
+        teamId_userId: {
           teamId,
+          userId,
         },
       },
     });
