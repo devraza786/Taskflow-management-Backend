@@ -37,9 +37,9 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-2xl bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100"
+            className="relative w-full max-w-2xl max-h-[90vh] flex flex-col bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100"
           >
-            <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+            <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50 shrink-0">
               <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">{title}</h3>
               <button
                 onClick={onClose}
@@ -49,7 +49,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
               </button>
             </div>
             
-            <div className="p-8">
+            <div className="p-4 sm:p-8 overflow-y-auto">
               {children}
             </div>
           </motion.div>
