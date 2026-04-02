@@ -1,8 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+import app from '../src/index';
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers manually at the very top before anything else
-  // This ensures even if the app crashes, preflight OPTIONS still works
   const origin = req.headers.origin as string;
   const allowedOrigins = [
     'https://taskflow-management-backend-web.vercel.app',
@@ -24,15 +25,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   );
   res.setHeader('Access-Control-Max-Age', '86400');
 
-  // Handle preflight OPTIONS immediately - before Express touches anything
+  // Handle preflight OPTIONS immediately
   if (req.method === 'OPTIONS') {
     res.status(204).end();
     return;
   }
 
   try {
-    // Dynamic import so boot-time crashes are caught and returned as JSON
-    const { default: app } = await import('../src/index');
     return app(req as any, res as any);
   } catch (err: any) {
     console.error('[Vercel Handler Crash]', err);
