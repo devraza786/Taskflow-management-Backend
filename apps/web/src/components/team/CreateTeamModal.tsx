@@ -1,37 +1,57 @@
-import React, { useState } from 'react';
-import { X, Users, MessageSquare, Info } from 'lucide-react';
-import api from '../../lib/api';
+import React, { useState, useEffect } from 'react';
+import { X, Users, Info, Plus } from 'lucide-react'; // Added Plus here
 import { toast } from 'react-hot-toast';
+import { useCreateTeam, useUpdateTeam, Team } from '../../hooks/useTeams';
 
 interface CreateTeamModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  team?: Team | null; // Optional team for editing
 }
 
-export default function CreateTeamModal({ isOpen, onClose, onSuccess }: CreateTeamModalProps) {
+export default function CreateTeamModal({ isOpen, onClose, onSuccess, team }: CreateTeamModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const createTeam = useCreateTeam();
+  const updateTeam = useUpdateTeam();
+
+  const isEditing = !!team;
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (team) {
+      setName(team.name);
+      setDescription(team.description || '');
+    } else {
+      setName('');
+      setDescription('');
+    }
+  }, [team]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     try {
-      await api.post('/teams', { name, description });
-      toast.success('Team created successfully');
+      if (isEditing && team) {
+        await updateTeam.mutateAsync({ id: team.id, name, description });
+        toast.success('Team updated successfully');
+      } else {
+        await createTeam.mutateAsync({ name, description });
+        toast.success('Team created successfully');
+      }
       onSuccess();
       onClose();
       setName('');
       setDescription('');
     } catch (error) {
-      toast.error('Failed to create team');
-    } finally {
-      setIsLoading(false);
+      toast.error(`Failed to ${isEditing ? 'update' : 'create'} team`);
     }
   };
+
+  const isLoading = createTeam.isLoading || updateTeam.isLoading;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -48,7 +68,9 @@ export default function CreateTeamModal({ isOpen, onClose, onSuccess }: CreateTe
                 <Users className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Create New Team</h2>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                  {isEditing ? 'Edit Team' : 'Create New Team'}
+                </h2>
                 <p className="text-slate-500 text-sm font-medium">Build a powerhouse for your projects.</p>
               </div>
             </div>
@@ -109,7 +131,7 @@ export default function CreateTeamModal({ isOpen, onClose, onSuccess }: CreateTe
                   <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    Create Team
+                    {isEditing ? 'Update Team' : 'Create Team'}
                     <Plus className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                   </>
                 )}
@@ -121,5 +143,3 @@ export default function CreateTeamModal({ isOpen, onClose, onSuccess }: CreateTe
     </div>
   );
 }
-
-import { Plus } from 'lucide-react';

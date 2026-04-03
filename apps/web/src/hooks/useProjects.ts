@@ -30,6 +30,18 @@ export function useProjects() {
   });
 }
 
+export function useProject(id: string) {
+  const token = useAuthStore((state) => state.accessToken);
+  return useQuery<Project>({
+    queryKey: ['projects', id],
+    queryFn: async () => {
+      const { data } = await api.get(`/projects/${id}`);
+      return data;
+    },
+    enabled: !!token && !!id,
+  });
+}
+
 export function useCreateProject() {
   const queryClient = useQueryClient();
   return useMutation({

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTeams } from '../../hooks/useTeams';
 import { useUsers } from '../../hooks/useUsers';
 import InviteMemberModal from '../../components/InviteMemberModal';
@@ -18,8 +19,10 @@ export default function TeamManagement() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
-  const handleDeleteTeam = async (id: string) => {
+  const handleDeleteTeam = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
     if (!confirm('Are you sure you want to delete this team?')) return;
     
     try {
@@ -95,7 +98,11 @@ export default function TeamManagement() {
                         </div>
                     ) : (
                         teams?.map((team) => (
-                            <div key={team.id} className="p-6 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:shadow-primary-600/5 transition-all group relative cursor-pointer">
+                            <div 
+                              key={team.id} 
+                              onClick={() => navigate(`/team/${team.id}`)}
+                              className="p-6 rounded-3xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:shadow-primary-600/5 transition-all group relative cursor-pointer"
+                            >
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="p-3 rounded-2xl bg-white text-primary-600 shadow-sm group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300">
                                         <Users className="h-5 w-5" />
@@ -103,10 +110,7 @@ export default function TeamManagement() {
                                     <div className="flex gap-1">
                                         <RoleGuard allowedRoles={['admin', 'manager']}>
                                             <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteTeam(team.id);
-                                                }}
+                                                onClick={(e) => handleDeleteTeam(e, team.id)}
                                                 className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-xl transition-all"
                                             >
                                                 <Trash2 className="h-4 w-4" />

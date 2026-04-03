@@ -7,7 +7,15 @@ interface User {
   name: string;
   role: 'admin' | 'manager' | 'team_head' | 'employee';
   orgId: string;
-  plan?: 'free' | 'starter' | 'business' | 'enterprise';
+  avatarUrl?: string;
+  organization?: {
+    id: string;
+    name: string;
+    slug: string;
+    plan: string;
+    createdAt: string;
+    tier?: string;
+  };
 }
 
 interface AuthState {

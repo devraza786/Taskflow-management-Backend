@@ -39,6 +39,18 @@ export const useTasks = (filters?: { projectId?: string; teamId?: string; status
   });
 };
 
+export const useTask = (id: string) => {
+  const token = useAuthStore((state) => state.accessToken);
+  return useQuery<Task>({
+    queryKey: ['tasks', id],
+    queryFn: async () => {
+      const { data } = await api.get(`/tasks/${id}`);
+      return data;
+    },
+    enabled: !!token && !!id,
+  });
+};
+
 export const useCreateTask = () => {
   const queryClient = useQueryClient();
   return useMutation({

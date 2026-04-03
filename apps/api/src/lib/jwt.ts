@@ -5,8 +5,8 @@ const JWT_EXPIRES_IN = '15m';
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'refreshsecret';
 const REFRESH_TOKEN_EXPIRES_IN = '30d';
 
-export const generateAccessToken = (userId: string, role: string, orgId: string) => {
-  return jwt.sign({ userId, role, orgId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+export const generateAccessToken = (userId: string, role: string, orgId: string, name: string) => {
+  return jwt.sign({ userId, role, orgId, name }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
 export const generateRefreshToken = (userId: string) => {
@@ -14,7 +14,7 @@ export const generateRefreshToken = (userId: string) => {
 };
 
 export const verifyAccessToken = (token: string) => {
-  return jwt.verify(token, JWT_SECRET) as { userId: string; role: string; orgId: string };
+  return jwt.verify(token, JWT_SECRET) as { userId: string; role: string; orgId: string; name: string };
 };
 
 export const verifyRefreshToken = (token: string) => {

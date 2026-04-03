@@ -62,7 +62,7 @@ export const register = async (req: Request, res: Response) => {
       return { user, org };
     });
 
-    const accessToken = generateAccessToken(result.user.id, result.user.role, result.user.orgId);
+    const accessToken = generateAccessToken(result.user.id, result.user.role, result.user.orgId, result.user.name);
     const refreshToken = generateRefreshToken(result.user.id);
 
     res.status(201).json({
@@ -72,6 +72,7 @@ export const register = async (req: Request, res: Response) => {
         name: result.user.name,
         role: result.user.role,
         orgId: result.user.orgId,
+        plan: result.org.plan,
       },
       accessToken,
       refreshToken,
@@ -116,7 +117,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const accessToken = generateAccessToken(user.id, user.role, user.orgId);
+    const accessToken = generateAccessToken(user.id, user.role, user.orgId, user.name);
     const refreshToken = generateRefreshToken(user.id);
 
     res.json({
@@ -126,6 +127,7 @@ export const login = async (req: Request, res: Response) => {
         name: user.name,
         role: user.role,
         orgId: user.orgId,
+        plan: user.organization.plan,
       },
       accessToken,
       refreshToken,

@@ -15,7 +15,9 @@ import commentRoutes from './routes/comment.routes';
 import attachmentRoutes from './routes/attachment.routes';
 
 import reportRoutes from './routes/report.routes';
+import exportRoutes from './routes/export.routes';
 import notificationRoutes from './routes/notification.routes';
+import invitationRoutes from './routes/invitation.routes';
 
 dotenv.config();
 
@@ -51,7 +53,9 @@ app.use('/api/v1/projects', projectRoutes);
 app.use('/api/v1/comments', commentRoutes);
 app.use('/api/v1/attachments', attachmentRoutes);
 app.use('/api/v1/reports', reportRoutes);
+app.use('/api/v1/exports', exportRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/invitations', invitationRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

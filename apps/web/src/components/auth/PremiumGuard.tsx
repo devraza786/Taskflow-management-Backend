@@ -12,17 +12,17 @@ interface PremiumGuardProps {
 }
 
 const TIER_LEVELS = {
-  free: 0,
-  starter: 1,
-  pro: 2,
-  business: 3,
-  enterprise: 4
+  FREE: 0,
+  STARTER: 1,
+  PRO: 2,
+  PREMIUM: 3,
+  ENTERPRISE: 4
 };
 
 export default function PremiumGuard({ children, fallback, minTier = 'business' }: PremiumGuardProps) {
   const user = useAuthStore((state) => state.user);
   
-  const userTier = (user?.plan || 'free') as keyof typeof TIER_LEVELS;
+  const userTier = (user?.organization?.plan || 'FREE') as keyof typeof TIER_LEVELS;
   const requiredTier = minTier as keyof typeof TIER_LEVELS;
   
   // Admin always has access

@@ -112,7 +112,9 @@ export const getTaskById = async (req: AuthRequest, res: Response) => {
               orderBy: { createdAt: 'asc' }
           },
           attachments: true,
-          dependencies: { include: { dependsOnTask: true } }
+          dependencies: { include: { dependsOnTask: true } },
+          project: { select: { id: true, name: true } },
+          team: { select: { id: true, name: true } }
         }
       });
   
@@ -189,6 +191,33 @@ export const updateTaskStatus = async (req: AuthRequest, res: Response) => {
     res.json(updatedTask);
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ errors: error.errors });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteTask = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const task = await prisma.task.findUnique({ where: { id } });
+    if (!task || task.orgId !== req.user.orgId) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Only admin, manager, team_head or creator can delete
+    if (req.user.role === 'employee' && task.createdBy !== req.user.userId) {
+      return res.status(403).json({ error: 'Insuficient permissions to delete this task.' });
+    }
+
+    await prisma.task.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    res.status(204).end();
+  } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }

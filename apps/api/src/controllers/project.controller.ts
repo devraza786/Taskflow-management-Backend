@@ -60,6 +60,31 @@ export const getProjects = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const getProjectById = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const project = await prisma.project.findUnique({
+      where: { id, orgId: req.user.orgId },
+      include: {
+        department: { select: { id: true, name: true } },
+        owner: { select: { id: true, name: true, avatarUrl: true } },
+        _count: {
+          select: { tasks: true },
+        },
+      },
+    });
+
+    if (!project) return res.status(404).json({ error: 'Project not found' });
+
+    res.json(project);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const updateProject = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;

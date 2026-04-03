@@ -1,37 +1,75 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Modal from './ui/Modal';
-import { useCreateTask } from '../hooks/useTasks';
+import { useCreateTask, useUpdateTask, Task } from '../hooks/useTasks';
 import { useProjects } from '../hooks/useProjects';
 import { useTeams } from '../hooks/useTeams';
-import { Calendar, Tag, User, Layout, Users } from 'lucide-react';
+import { Calendar, Tag, Layout, Users } from 'lucide-react';
 
 interface CreateTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
+  task?: Task | null; // Optional task for editing
 }
 
-export default function CreateTaskModal({ isOpen, onClose }: CreateTaskModalProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+export default function CreateTaskModal({ isOpen, onClose, task }: CreateTaskModalProps) {
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
   const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
   const { data: projects } = useProjects();
   const { data: teams } = useTeams();
 
+  const isEditing = !!task;
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (task) {
+      setValue('title', task.title);
+      setValue('description', task.description || '');
+      setValue('priority', task.priority);
+      setValue('status', task.status);
+      setValue('projectId', task.projectId || '');
+      setValue('teamId', task.teamId || '');
+      setValue('tags', task.tags?.join(', ') || '');
+      if (task.dueDate) {
+        // Convert to datetime-local format: YYYY-MM-DDThh:mm
+        const date = new Date(task.dueDate);
+        const formattedDate = date.toISOString().slice(0, 16);
+        setValue('dueDate', formattedDate);
+      }
+    } else {
+      reset();
+    }
+  }, [task, setValue, reset]);
+
   const onSubmit = async (data: any) => {
     try {
-      await createTask.mutateAsync({
+      const formattedData = {
         ...data,
         tags: data.tags ? data.tags.split(',').map((tag: string) => tag.trim()) : [],
-      });
+      };
+
+      if (isEditing && task) {
+        await updateTask.mutateAsync({ id: task.id, ...formattedData });
+      } else {
+        await createTask.mutateAsync(formattedData);
+      }
+      
       reset();
       onClose();
     } catch (error) {
-      console.error('Failed to create task:', error);
+      console.error('Failed to save task:', error);
     }
   };
 
+  const isLoading = createTask.isLoading || updateTask.isLoading;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create New Task">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      title={isEditing ? 'Edit Task' : 'Create New Task'}
+    >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700">Task Title</label>
@@ -60,7 +98,7 @@ export default function CreateTaskModal({ isOpen, onClose }: CreateTaskModalProp
             </label>
             <select
               {...register('priority')}
-              className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none"
+              className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none px-4"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -76,7 +114,7 @@ export default function CreateTaskModal({ isOpen, onClose }: CreateTaskModalProp
             <input
               type="datetime-local"
               {...register('dueDate')}
-              className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none"
+              className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none px-4"
             />
           </div>
         </div>
@@ -88,7 +126,7 @@ export default function CreateTaskModal({ isOpen, onClose }: CreateTaskModalProp
             </label>
             <select
               {...register('projectId')}
-              className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none"
+              className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none px-4"
             >
               <option value="">No Project</option>
               {projects?.map((project: any) => (
@@ -103,7 +141,7 @@ export default function CreateTaskModal({ isOpen, onClose }: CreateTaskModalProp
             </label>
             <select
               {...register('teamId')}
-              className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none"
+              className="w-full px-5 py-3 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all outline-none px-4"
             >
               <option value="">No Team</option>
               {teams?.map((team: any) => (
@@ -134,10 +172,10 @@ export default function CreateTaskModal({ isOpen, onClose }: CreateTaskModalProp
           </button>
           <button
             type="submit"
-            disabled={createTask.isLoading}
+            disabled={isLoading}
             className="flex-1 px-5 py-3 rounded-2xl font-bold bg-primary-600 text-white shadow-lg shadow-primary-200 hover:bg-primary-700 active:scale-95 transition-all disabled:opacity-50"
           >
-            {createTask.isLoading ? 'Creating...' : 'Create Task'}
+            {isLoading ? 'Saving...' : isEditing ? 'Update Task' : 'Create Task'}
           </button>
         </div>
       </form>

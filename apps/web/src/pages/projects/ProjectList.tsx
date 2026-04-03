@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import { useProjects, Project } from '../../hooks/useProjects';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useProjects, type Project } from '../../hooks/useProjects';
 import CreateProjectModal from '../../components/CreateProjectModal';
 import RoleGuard from '../../components/auth/RoleGuard';
 import { 
   Plus, 
   FolderKanban, 
   MoreVertical, 
-  Calendar, 
   Clock,
-  CheckCircle2,
-  Circle
+  CheckCircle2
 } from 'lucide-react';
 
 const StatusBadge = ({ status }: { status: Project['status'] }) => {
@@ -31,6 +30,7 @@ const StatusBadge = ({ status }: { status: Project['status'] }) => {
 export default function ProjectList() {
   const { data: projects, isLoading } = useProjects();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -67,7 +67,8 @@ export default function ProjectList() {
           projects?.map((project) => (
             <div 
               key={project.id} 
-              className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-600/5 transition-all group flex flex-col"
+              onClick={() => navigate(`/projects/${project.id}`)}
+              className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-600/5 transition-all group flex flex-col cursor-pointer"
             >
               <div className="flex justify-between items-start mb-6">
                 <div className="p-4 rounded-2xl bg-primary-50 text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300">

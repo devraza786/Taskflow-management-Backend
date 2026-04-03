@@ -14,9 +14,20 @@ export interface TaskDistribution {
   _count: number;
 }
 
+export interface VelocityPoint {
+  name: string;
+  completed: number;
+  total: number;
+}
+
 export interface ProjectStats {
   projects: ProjectStat[];
   taskDistribution: TaskDistribution[];
+  metrics: {
+    completed: number;
+    avgDays: string;
+    velocity: VelocityPoint[];
+  };
 }
 
 export interface TeamPerformanceStat {
@@ -25,12 +36,14 @@ export interface TeamPerformanceStat {
   _count: { members: number; tasks: number };
 }
 
-export function useProjectStats() {
+export function useProjectStats(startDate?: string, endDate?: string) {
   const token = useAuthStore((state) => state.accessToken);
   return useQuery<ProjectStats>({
-    queryKey: ['reports', 'project-stats'],
+    queryKey: ['reports', 'project-stats', startDate, endDate],
     queryFn: async () => {
-      const { data } = await api.get('/reports/project-stats');
+      const { data } = await api.get('/reports/project-stats', {
+        params: { startDate, endDate }
+      });
       return data;
     },
     enabled: !!token,
@@ -46,5 +59,25 @@ export function useTeamPerformance() {
       return data;
     },
     enabled: !!token,
+  });
+}
+
+export interface AIInsight {
+  title: string;
+  description: string;
+  type: string;
+  color: string;
+}
+
+export function useAIInsights() {
+  const token = useAuthStore((state) => state.accessToken);
+  return useQuery<AIInsight[]>({
+    queryKey: ['reports', 'ai-insights'],
+    queryFn: async () => {
+      const { data } = await api.get('/reports/ai-insights');
+      return data;
+    },
+    enabled: !!token,
+    retry: false
   });
 }

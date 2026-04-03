@@ -85,6 +85,7 @@ model Organization {
   teams       Team[]
   projects    Project[]
   tasks       Task[]
+  invitations Invitation[]
   auditLogs   AuditLog[]
 
   @@map("organizations")
@@ -118,6 +119,7 @@ model User {
   comments           Comment[]
   attachments        Attachment[]
   notifications      Notification[]
+  invitationsCreated Invitation[] @relation("Inviter")
   auditLogs          AuditLog[]   @relation("Actor")
 
   @@map("users")
@@ -155,6 +157,7 @@ model Team {
 
   members     TeamMember[]
   tasks       Task[]
+  invitations Invitation[]
 
   @@map("teams")
 }
@@ -231,8 +234,37 @@ model Task {
   dependents     TaskDependency[] @relation("TaskDependents")
   comments       Comment[]
   attachments    Attachment[]
+  invitations    Invitation[]
 
   @@map("tasks")
+}
+
+model Invitation {
+  id             String   @id @default(uuid()) @db.Uuid
+  email          String   @db.VarChar(320)
+  role           Role     @default(employee)
+  orgId          String   @map("org_id") @db.Uuid
+  organization   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  teamId         String?  @map("team_id") @db.Uuid
+  team           Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  taskId         String?  @map("task_id") @db.Uuid
+  task           Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  inviterId      String   @map("inviter_id") @db.Uuid
+  inviter        User     @relation("Inviter", fields: [inviterId], references: [id])
+  token          String   @unique
+  status         InvitationStatus @default(pending)
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  acceptedAt     DateTime? @map("accepted_at") @db.Timestamptz
+
+  @@map("invitations")
+}
+
+enum InvitationStatus {
+  pending
+  accepted
+  expired
+  revoked
 }
 
 model TaskAssignee {

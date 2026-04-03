@@ -11,6 +11,10 @@ import ProjectList from './pages/projects/ProjectList';
 import TeamManagement from './pages/team/TeamManagement';
 import Settings from './pages/settings/Settings';
 import Reporting from './pages/Reporting';
+import TaskDetail from './pages/tasks/TaskDetail';
+import ProjectDetail from './pages/projects/ProjectDetail';
+import TeamDetail from './pages/teams/TeamDetail';
+import AcceptInvitation from './pages/auth/AcceptInvitation';
 import PremiumGuard from './components/auth/PremiumGuard';
 import Sidebar from './components/layout/Sidebar';
 import Navbar from './components/layout/Navbar';
@@ -53,7 +57,7 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
               animate="animate"
               exit="exit"
               variants={pageVariants}
-              transition={pageTransition}
+              transition={pageTransition as any}
               className="h-full"
             >
               {children}
@@ -76,6 +80,7 @@ function App() {
         <Shell>
           <RouteItem path="/login" element={<Login />} />
           <RouteItem path="/register" element={<Register />} />
+          <RouteItem path="/accept-invitation/:token" element={<AcceptInvitation />} />
           
           <RouteItem
             path="/"
@@ -96,6 +101,15 @@ function App() {
           />
 
           <RouteItem
+            path="/tasks/:id"
+            element={
+              <ProtectedLayout>
+                <TaskDetail />
+              </ProtectedLayout>
+            }
+          />
+
+          <RouteItem
             path="/projects"
             element={
               <ProtectedLayout>
@@ -105,10 +119,28 @@ function App() {
           />
 
           <RouteItem
+            path="/projects/:id"
+            element={
+              <ProtectedLayout>
+                <ProjectDetail />
+              </ProtectedLayout>
+            }
+          />
+
+          <RouteItem
             path="/team"
             element={
               <ProtectedLayout>
                 <TeamManagement />
+              </ProtectedLayout>
+            }
+          />
+
+          <RouteItem
+            path="/team/:id"
+            element={
+              <ProtectedLayout>
+                <TeamDetail />
               </ProtectedLayout>
             }
           />

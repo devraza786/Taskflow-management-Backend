@@ -32,6 +32,18 @@ export function useTeams() {
   });
 }
 
+export function useTeam(id: string) {
+  const token = useAuthStore((state) => state.accessToken);
+  return useQuery<Team>({
+    queryKey: ['teams', id],
+    queryFn: async () => {
+      const { data } = await api.get(`/teams/${id}`);
+      return data;
+    },
+    enabled: !!token && !!id,
+  });
+}
+
 export function useTeamMembers(teamId: string) {
   const token = useAuthStore((state) => state.accessToken);
   return useQuery<TeamMember[]>({

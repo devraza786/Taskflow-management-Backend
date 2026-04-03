@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+const getBaseURL = () => {
+  const url = import.meta.env.VITE_API_URL || 'https://taskflow-management-backend-api.vercel.app/api/v1';
+  // Ensure we don't have v1/api swapped
+  if (url.includes('/v1/api')) {
+    return url.replace('/v1/api', '/api/v1');
+  }
+  return url;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://taskflow-management-backend-api.vercel.app/api/v1',
+  baseURL: getBaseURL(),
 });
 
 api.interceptors.request.use((config) => {
