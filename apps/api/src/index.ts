@@ -25,8 +25,6 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // Middleware
-app.use(helmet());
-
 const allowedOrigins = [
   'http://localhost:5173',
   'https://taskflow-management-backend-web.vercel.app',
@@ -37,6 +35,10 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+}));
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 
 app.use(morgan('dev'));

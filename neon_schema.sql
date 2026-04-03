@@ -1,5 +1,23 @@
--- Taskflow Management System - Neon Database Schema (Production)
--- Generated on: 2026-03-28
+-- ==========================================
+-- 0. Database Initialization
+-- ==========================================
+
+-- Create schema if not exists
+CREATE SCHEMA IF NOT EXISTS public;
+
+-- Enable pgcrypto extension for gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Define ENUM types from schema.prisma
+CREATE TYPE "Plan" AS ENUM ('free', 'starter', 'business', 'enterprise');
+CREATE TYPE "Role" AS ENUM ('admin', 'manager', 'team_head', 'employee');
+CREATE TYPE "UserStatus" AS ENUM ('active', 'inactive', 'suspended');
+CREATE TYPE "ProjectStatus" AS ENUM ('planning', 'active', 'on_hold', 'completed', 'cancelled');
+CREATE TYPE "TaskStatus" AS ENUM ('todo', 'in_progress', 'review', 'blocked', 'done', 'archived');
+CREATE TYPE "TaskPriority" AS ENUM ('critical', 'high', 'medium', 'low');
+CREATE TYPE "AssigneeRole" AS ENUM ('primary', 'reviewer', 'watcher');
+CREATE TYPE "DependencyType" AS ENUM ('blocks', 'blocked_by', 'related');
+CREATE TYPE "InvitationStatus" AS ENUM ('pending', 'accepted', 'expired', 'revoked');
 
 -- ==========================================
 -- 1. Core Organizational Structures
